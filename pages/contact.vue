@@ -102,6 +102,7 @@ import { ref, reactive } from 'vue'
 
 const config = useRuntimeConfig()
 const schoolEmail = config.public.schoolEmail
+const { error: notifyError } = useNotify()
 
 const contacts = [
   { icon: 'location', label: 'Адрес', value: 'г. Москва, ул. Школьная, д. 15' },
@@ -129,7 +130,7 @@ const handleSubmit = async () => {
   if (!formData.email && !formData.telegram) {
     submitStatus.value = 'error'
     isSubmitting.value = false
-    alert('Укажите Email или Telegram для связи')
+    notifyError('Укажите Email или Telegram для связи')
     return
   }
 

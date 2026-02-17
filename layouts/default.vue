@@ -32,16 +32,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 const mobileMenuOpen = ref(false)
+const pages = ref([])
 
-const pages = [
-  { path: '/about', title: 'О школе' },
-  { path: '/schedule-example', title: 'Расписание' },
-  { path: '/gallery-example', title: 'Галерея' },
-  { path: '/contact', title: 'Контакты' }
-]
+const { loadPages } = useContent()
+
+onMounted(async () => {
+  const allPages = await loadPages(true) // Только видимые страницы
+  pages.value = allPages
+})
 </script>
 
 <style scoped>

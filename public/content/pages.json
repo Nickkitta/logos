@@ -1,0 +1,32 @@
+{
+  "pages": [
+    {
+      "id": "about",
+      "path": "/about",
+      "title": "О школе",
+      "visible": true,
+      "order": 1
+    },
+    {
+      "id": "contact",
+      "path": "/contact",
+      "title": "Контакты",
+      "visible": true,
+      "order": 2
+    },
+    {
+      "id": "gallery",
+      "path": "/gallery-example",
+      "title": "Галерея",
+      "visible": true,
+      "order": 3
+    },
+    {
+      "id": "test",
+      "path": "/test",
+      "title": "Тестовая",
+      "visible": true,
+      "order": 4
+    }
+  ]
+}
