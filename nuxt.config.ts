@@ -5,11 +5,11 @@ export default defineNuxtConfig({
   
   app: {
     head: {
-      title: 'Школа №15',
+      title: 'Центр Логос',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Официальный сайт школы №15 - расписание, контакты, информация' }
+        { name: 'description', content: 'Официальный сайт Центра Логос - расписание, контакты, информация' }
       ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
@@ -23,6 +23,9 @@ export default defineNuxtConfig({
     // Приватные ключи (доступны только на сервере)
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN,
     telegramChatId: process.env.TELEGRAM_CHAT_ID,
+    adminPassword: process.env.ADMIN_PASSWORD,
+    smtpUser: process.env.SMTP_USER,
+    smtpPass: process.env.SMTP_PASS,
     
     // Публичные ключи (доступны и на клиенте)
     public: {

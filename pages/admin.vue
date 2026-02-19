@@ -1,11 +1,32 @@
 <template>
-  <div class="admin-panel">
+  <ClientOnly>
+    <div class="admin-panel">
     <div class="admin-header">
       <h1>🎨 Панель управления контентом</h1>
-      <NuxtLink to="/" class="back-link">← Вернуться на сайт</NuxtLink>
+      <div class="header-actions">
+        <NuxtLink to="/" class="back-link">← Вернуться на сайт</NuxtLink>
+        <button @click="logout" class="logout-btn">🚪 Выйти</button>
+      </div>
     </div>
 
-    <div class="admin-content">
+    <div class="admin-tabs">
+      <button 
+        @click="activeTab = 'pages'" 
+        :class="{ active: activeTab === 'pages' }"
+        class="tab-btn"
+      >
+        📄 Страницы
+      </button>
+      <button 
+        @click="activeTab = 'contacts'" 
+        :class="{ active: activeTab === 'contacts' }"
+        class="tab-btn"
+      >
+        📞 Контакты
+      </button>
+    </div>
+
+    <div class="admin-content" v-if="activeTab === 'pages'">
       <!-- Список страниц -->
       <div class="section">
         <div class="section-header">
@@ -96,6 +117,16 @@
           <h3>📖 Как пользоваться редактором</h3>
           
           <div class="help-section">
+            <h4>📚 Справочник компонентов</h4>
+            <p>
+              <NuxtLink to="/components-showcase" target="_blank" class="showcase-link">
+                → Открыть полный справочник с примерами всех компонентов
+              </NuxtLink>
+            </p>
+            <p>В справочнике вы найдете подробное описание каждого компонента, все доступные настройки и живые примеры.</p>
+          </div>
+          
+          <div class="help-section">
             <h4>1. Основная информация</h4>
             <p>Заполните заголовок и подзаголовок страницы.</p>
           </div>
@@ -104,13 +135,30 @@
             <h4>2. Добавление компонентов</h4>
             <p>Нажмите "+ Добавить компонент" и выберите нужный тип:</p>
             <ul>
-              <li><strong>📝 Текстовый блок</strong> - обычный текст, поддерживает HTML</li>
-              <li><strong>📌 Заголовок секции</strong> - заголовки h2 или h3</li>
-              <li><strong>💬 Цитата</strong> - красивый блок с цитатой и автором</li>
-              <li><strong>📢 Объявление</strong> - важные объявления с иконками и текстом</li>
-              <li><strong>🖼️ Изображение</strong> - одиночное изображение с подписью</li>
-              <li><strong>🃏 Карточки</strong> - сетка информационных карточек с иконками</li>
-              <li><strong>🖼️ Фотогалерея</strong> - слайдер с несколькими изображениями</li>
+              <li><strong>📝 Текстовый блок</strong> - обычный текст, поддерживает HTML
+                <br><em>Варианты оформления:</em> обычный (белый фон), яркий (градиент), с рамкой (зеленая рамка)
+              </li>
+              <li><strong>📌 Заголовок секции</strong> - заголовки h2 или h3
+                <br><em>Варианты оформления:</em> обычный (с зеленой полосой слева), акцентный (зеленый текст), центрированный
+              </li>
+              <li><strong>💬 Цитата</strong> - красивый блок с цитатой и автором
+                <br><em>Варианты оформления:</em> обычная (белый фон), акцентная (градиентный фон), центрированная
+              </li>
+              <li><strong>📢 Объявление</strong> - важные объявления с иконками и текстом
+                <br><em>Типы:</em> информация (синий), важное (красный), успех (зеленый)
+                <br><em>Иконки:</em> info, warning, check, megaphone
+              </li>
+              <li><strong>🖼️ Изображение</strong> - одиночное изображение с подписью
+                <br><em>Размеры:</em> маленькое, среднее, большое
+              </li>
+              <li><strong>🃏 Карточки</strong> - сетка информационных карточек с иконками
+                <br><em>Варианты карточек:</em> обычная (белый фон), акцентная (градиент), с рамкой
+              </li>
+              <li><strong>🎬 Галерея</strong> - слайдер с фото и видео (YouTube, VK, Rutube)</li>
+              <li><strong>🎥 Видео</strong> - встроенное видео с YouTube, VK или Rutube</li>
+              <li><strong>📄 Документ</strong> - ссылка на документ или встроенный просмотр (Google Drive, Яндекс.Диск)
+                <br><em>Типы отображения:</em> ссылка для скачивания, встроенный просмотр
+              </li>
             </ul>
           </div>
 
@@ -147,7 +195,7 @@
               class="component-item"
             >
               <div class="component-header">
-                <span class="component-type">{{ component.type }}</span>
+                <span class="component-type">{{ getComponentTypeName(component.type) }}</span>
                 <div class="component-controls">
                   <button @click="moveComponent(index, -1)" :disabled="index === 0">↑</button>
                   <button @click="moveComponent(index, 1)" :disabled="index === pageContent.components.length - 1">↓</button>
@@ -176,32 +224,60 @@
                       <label>Текст</label>
                       <textarea v-model="card.content" class="form-control" rows="2"></textarea>
                     </div>
+                    <div class="form-group">
+                      <label>Вариант оформления</label>
+                      <select v-model="card.variant" class="form-control">
+                        <option value="default">Обычная (белый фон)</option>
+                        <option value="accent">Акцентная (градиентный фон)</option>
+                        <option value="bordered">С рамкой (зеленая рамка)</option>
+                      </select>
+                    </div>
                   </div>
                   <button @click="addCard(index)" class="btn-secondary">+ Добавить карточку</button>
                 </div>
 
                 <!-- Специальная обработка для gallery -->
                 <div v-else-if="component.type === 'gallery'" class="gallery-editor">
-                  <h4>Изображения галереи</h4>
-                  <div v-for="(image, imageIndex) in component.props.images" :key="imageIndex" class="image-editor">
+                  <h4>Элементы галереи (фото и видео)</h4>
+                  <div v-for="(item, itemIndex) in component.props.items" :key="itemIndex" class="gallery-item-editor">
                     <div class="card-header">
-                      <span>Изображение {{ imageIndex + 1 }}</span>
-                      <button @click="removeGalleryImage(index, imageIndex)" class="btn-danger-small">🗑️</button>
+                      <span>{{ item.type === 'video' ? '🎥 Видео' : '🖼️ Фото' }} {{ itemIndex + 1 }}</span>
+                      <button @click="removeGalleryItem(index, itemIndex)" class="btn-danger-small">🗑️</button>
                     </div>
+                    
                     <div class="form-group">
-                      <label>URL изображения</label>
-                      <input v-model="image.src" type="text" class="form-control" placeholder="https://example.com/image.jpg" />
+                      <label>Тип элемента</label>
+                      <select v-model="item.type" class="form-control">
+                        <option value="image">🖼️ Изображение</option>
+                        <option value="video">🎥 Видео</option>
+                      </select>
                     </div>
+                    
+                    <div class="form-group">
+                      <label>{{ item.type === 'video' ? 'URL видео (YouTube, VK, Rutube)' : 'URL изображения' }}</label>
+                      <input v-model="item.src" type="text" class="form-control" 
+                        :placeholder="item.type === 'video' ? 'https://www.youtube.com/watch?v=...' : 'https://example.com/image.jpg'" />
+                    </div>
+                    
+                    <div v-if="item.type === 'video'" class="form-group">
+                      <label>URL превью (необязательно)</label>
+                      <input v-model="item.thumbnail" type="text" class="form-control" placeholder="https://example.com/thumbnail.jpg" />
+                    </div>
+                    
                     <div class="form-group">
                       <label>Описание (alt)</label>
-                      <input v-model="image.alt" type="text" class="form-control" />
+                      <input v-model="item.alt" type="text" class="form-control" />
                     </div>
+                    
                     <div class="form-group">
                       <label>Подпись</label>
-                      <input v-model="image.caption" type="text" class="form-control" />
+                      <input v-model="item.caption" type="text" class="form-control" />
                     </div>
                   </div>
-                  <button @click="addGalleryImage(index)" class="btn-secondary">+ Добавить изображение</button>
+                  <div class="gallery-add-buttons">
+                    <button @click="addGalleryItem(index, 'image')" class="btn-secondary">+ Добавить фото</button>
+                    <button @click="addGalleryItem(index, 'video')" class="btn-secondary">+ Добавить видео</button>
+                  </div>
                 </div>
 
                 <!-- Обычные свойства для других компонентов -->
@@ -211,13 +287,102 @@
                       {{ formatPropLabel(key) }}
                       <span class="prop-hint">{{ getPropHint(component.type, key) }}</span>
                     </label>
+                    
+                    <!-- Селект для level (заголовки) -->
+                    <select 
+                      v-if="key === 'level'"
+                      v-model="component.props[key]"
+                      class="form-control"
+                    >
+                      <option value="h2">Большой заголовок (h2)</option>
+                      <option value="h3">Средний заголовок (h3)</option>
+                    </select>
+                    
+                    <!-- Селект для variant (разные компоненты) -->
+                    <select 
+                      v-else-if="key === 'variant' && component.type === 'text-block'"
+                      v-model="component.props[key]"
+                      class="form-control"
+                    >
+                      <option value="default">Обычный (белый фон)</option>
+                      <option value="highlight">Яркий (градиентный фон)</option>
+                      <option value="bordered">С рамкой (зеленая рамка)</option>
+                    </select>
+                    
+                    <select 
+                      v-else-if="key === 'variant' && component.type === 'section-heading'"
+                      v-model="component.props[key]"
+                      class="form-control"
+                    >
+                      <option value="default">Обычный</option>
+                      <option value="accent">Акцентный (зеленый)</option>
+                      <option value="centered">Центрированный</option>
+                    </select>
+                    
+                    <select 
+                      v-else-if="key === 'variant' && component.type === 'quote'"
+                      v-model="component.props[key]"
+                      class="form-control"
+                    >
+                      <option value="default">Обычная</option>
+                      <option value="accent">Акцентная (градиентный фон)</option>
+                      <option value="centered">Центрированная</option>
+                    </select>
+                    
+                    <!-- Селект для type (объявления) -->
+                    <select 
+                      v-else-if="key === 'type' && component.type === 'announcement'"
+                      v-model="component.props[key]"
+                      class="form-control"
+                    >
+                      <option value="info">Информация (синяя)</option>
+                      <option value="important">Важное (красная)</option>
+                      <option value="success">Успех (зеленая)</option>
+                    </select>
+                    
+                    <!-- Селект для icon (объявления) -->
+                    <select 
+                      v-else-if="key === 'icon' && component.type === 'announcement'"
+                      v-model="component.props[key]"
+                      class="form-control"
+                    >
+                      <option value="info">Информация (i)</option>
+                      <option value="warning">Предупреждение (⚠)</option>
+                      <option value="check">Галочка (✓)</option>
+                      <option value="megaphone">Мегафон (📢)</option>
+                    </select>
+                    
+                    <!-- Селект для size (изображения) -->
+                    <select 
+                      v-else-if="key === 'size' && component.type === 'image'"
+                      v-model="component.props[key]"
+                      class="form-control"
+                    >
+                      <option value="small">Маленькое</option>
+                      <option value="medium">Среднее</option>
+                      <option value="large">Большое</option>
+                    </select>
+                    
+                    <!-- Селект для viewType (документы) -->
+                    <select 
+                      v-else-if="key === 'viewType' && component.type === 'document'"
+                      v-model="component.props[key]"
+                      class="form-control"
+                    >
+                      <option value="link">Ссылка для скачивания</option>
+                      <option value="embed">Встроенный просмотр</option>
+                    </select>
+                    
+                    <!-- Textarea для длинных текстов -->
                     <textarea 
-                      v-if="typeof value === 'string' && (value.length > 50 || key === 'content')"
+                      v-else-if="typeof value === 'string' && (value.length > 50 || key === 'content' || key === 'description')"
                       v-model="component.props[key]"
                       class="form-control"
                       :rows="key === 'content' ? 5 : 3"
                       :placeholder="getPropPlaceholder(component.type, key)"
                     ></textarea>
+                    
+                    <!-- Обычный input для остальных -->
                     <input 
                       v-else
                       v-model="component.props[key]"
@@ -233,6 +398,64 @@
             <div v-if="pageContent.components.length === 0" class="empty-state">
               Нет компонентов. Нажмите "+ Добавить компонент" чтобы начать.
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Секция контактов -->
+    <div class="admin-content-single" v-if="activeTab === 'contacts'">
+      <div class="section">
+        <div class="section-header">
+          <h2>⚙️ Настройки контактов</h2>
+          <button @click="saveContacts" class="btn-success" :disabled="savingContacts">
+            {{ savingContacts ? 'Сохранение...' : '💾 Сохранить' }}
+          </button>
+        </div>
+
+        <div class="contacts-editor">
+          <div class="form-group">
+            <label>Адрес школы</label>
+            <input v-model="contactsData.address" type="text" class="form-control" placeholder="г. Москва, ул. Школьная, д. 15" />
+          </div>
+
+          <div class="form-group">
+            <label>Координаты (широта, долгота)</label>
+            <div class="coordinates-input">
+              <input 
+                v-model.number="contactsData.coordinates[0]" 
+                type="number" 
+                step="0.000001"
+                class="form-control" 
+                placeholder="Широта (например, 55.751244)" 
+              />
+              <input 
+                v-model.number="contactsData.coordinates[1]" 
+                type="number" 
+                step="0.000001"
+                class="form-control" 
+                placeholder="Долгота (например, 37.618423)" 
+              />
+            </div>
+            <small class="field-hint">
+              Найдите координаты на <a href="https://yandex.ru/maps/" target="_blank">Яндекс.Картах</a>: 
+              кликните правой кнопкой на нужное место → "Что здесь?" → скопируйте координаты
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>Телефон</label>
+            <input v-model="contactsData.phone" type="text" class="form-control" placeholder="+7 (495) 123-45-67" />
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input v-model="contactsData.email" type="email" class="form-control" placeholder="info@school.ru" />
+          </div>
+
+          <div class="form-group">
+            <label>Режим работы</label>
+            <input v-model="contactsData.workingHours" type="text" class="form-control" placeholder="Пн-Пт: 8:00 - 18:00" />
           </div>
         </div>
       </div>
@@ -285,13 +508,21 @@
       </div>
     </div>
   </div>
+  <template #fallback>
+    <div class="loading-fallback">
+      <div class="spinner"></div>
+    </div>
+  </template>
+  </ClientOnly>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 
 definePageMeta({
-  layout: false
+  layout: false,
+  middleware: 'auth',
+  ssr: false
 })
 
 const { loadPages, loadPageContent, savePageContent, createPage, deletePage: deletePageApi } = useContent()
@@ -305,6 +536,17 @@ const saving = ref(false)
 const showCreatePage = ref(false)
 const showAddComponent = ref(false)
 const showHelp = ref(false)
+const activeTab = ref('pages')
+
+// Контакты
+const contactsData = ref({
+  address: '',
+  coordinates: [0, 0],
+  phone: '',
+  email: '',
+  workingHours: ''
+})
+const savingContacts = ref(false)
 
 const newPage = ref({
   id: '',
@@ -319,17 +561,63 @@ const componentTypes = [
   { value: 'announcement', label: 'Объявление', icon: '📢' },
   { value: 'image', label: 'Изображение', icon: '🖼️' },
   { value: 'info-cards', label: 'Информационные карточки', icon: '🃏' },
-  { value: 'gallery', label: 'Фотогалерея', icon: '🖼️' }
+  { value: 'gallery', label: 'Галерея (фото/видео)', icon: '🎬' },
+  { value: 'video', label: 'Видео', icon: '🎥' },
+  { value: 'document', label: 'Документ', icon: '📄' }
 ]
+
+// Функция выхода
+const logout = () => {
+  sessionStorage.removeItem('admin_authenticated')
+  navigateTo('/login')
+}
 
 onMounted(async () => {
   await loadPagesList()
+  await loadContacts()
 })
 
 const loadPagesList = async () => {
   loading.value = true
   pages.value = await loadPages()
   loading.value = false
+}
+
+// Загрузка контактов
+const loadContacts = async () => {
+  try {
+    const response = await fetch('/content/contacts.json')
+    if (response.ok) {
+      const data = await response.json()
+      contactsData.value = data
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки контактов:', error)
+  }
+}
+
+// Сохранение контактов
+const saveContacts = async () => {
+  savingContacts.value = true
+  try {
+    const response = await fetch('/api/content/save-contacts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(contactsData.value)
+    })
+    
+    if (!response.ok) {
+      throw new Error('Ошибка сохранения')
+    }
+    
+    success('Контактные данные успешно сохранены!')
+  } catch (error) {
+    notifyError('Ошибка сохранения: ' + error.message)
+  } finally {
+    savingContacts.value = false
+  }
 }
 
 const selectPage = async (page) => {
@@ -451,16 +739,18 @@ const addComponent = () => {
 const addComponentType = (type) => {
   const defaultProps = {
     'text-block': { 
-      content: '<p>Введите текст здесь. Можно использовать HTML теги: &lt;p&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;li&gt;</p>'
+      content: '<p>Введите текст здесь. Можно использовать HTML теги: &lt;p&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;li&gt;</p>',
+      variant: 'default' // default, highlight, bordered
     },
     'section-heading': { 
       text: 'Заголовок секции', 
-      level: 'h2' // h2 или h3
+      level: 'h2', // h2 или h3
+      variant: 'default' // default, accent, centered
     },
     'quote': { 
       text: 'Текст цитаты', 
       author: 'Автор цитаты',
-      variant: 'default' // default или accent
+      variant: 'default' // default, accent, centered
     },
     'announcement': { 
       title: 'Заголовок объявления',
@@ -480,28 +770,52 @@ const addComponentType = (type) => {
         {
           title: 'Карточка 1',
           icon: 'star',
-          content: 'Описание карточки 1'
+          content: 'Описание карточки 1',
+          variant: 'default'
         },
         {
           title: 'Карточка 2',
           icon: 'heart',
-          content: 'Описание карточки 2'
+          content: 'Описание карточки 2',
+          variant: 'default'
         }
       ]
     },
     'gallery': {
-      images: [
+      items: [
         {
+          type: 'image',
           src: 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=1200',
           alt: 'Описание изображения 1',
           caption: 'Подпись к изображению 1'
         },
         {
+          type: 'image',
           src: 'https://images.unsplash.com/photo-1503676382389-4809596d5290?w=1200',
           alt: 'Описание изображения 2',
           caption: 'Подпись к изображению 2'
+        },
+        {
+          type: 'video',
+          src: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+          alt: 'Описание видео',
+          caption: 'Подпись к видео',
+          thumbnail: 'https://images.unsplash.com/photo-1492619375914-88005aa9e8fb?w=400'
         }
       ]
+    },
+    'video': {
+      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      title: 'Название видео',
+      description: 'Описание видео (необязательно)'
+    },
+    'document': {
+      url: 'https://drive.google.com/file/d/ВАШ_ID_ФАЙЛА/view',
+      title: 'Название документа',
+      size: '2.5 МБ',
+      description: 'Описание документа (необязательно)',
+      viewType: 'link', // link или embed
+      downloadName: ''
     }
   }
 
@@ -550,37 +864,73 @@ const formatPropLabel = (key) => {
     'author': 'Автор',
     'title': 'Заголовок',
     'subtitle': 'Подзаголовок',
-    'level': 'Уровень',
-    'variant': 'Вариант',
+    'level': 'Уровень заголовка',
+    'variant': 'Вариант оформления',
     'type': 'Тип',
     'icon': 'Иконка',
     'date': 'Дата',
-    'src': 'URL изображения',
+    'src': 'Ссылка',
+    'url': 'Ссылка',
     'alt': 'Описание',
     'caption': 'Подпись',
     'size': 'Размер',
-    'images': 'Изображения'
+    'images': 'Изображения',
+    'description': 'Описание',
+    'viewType': 'Тип отображения',
+    'downloadName': 'Имя файла при скачивании'
   }
   return labels[key] || key
+}
+
+// Перевод названий типов компонентов
+const getComponentTypeName = (type) => {
+  const names = {
+    'text-block': '📝 Текстовый блок',
+    'section-heading': '📌 Заголовок секции',
+    'quote': '💬 Цитата',
+    'announcement': '📢 Объявление',
+    'image': '🖼️ Изображение',
+    'info-cards': '🃏 Информационные карточки',
+    'gallery': '🎬 Галерея',
+    'video': '🎥 Видео',
+    'document': '📄 Документ'
+  }
+  return names[type] || type
 }
 
 // Подсказки для свойств
 const getPropHint = (componentType, propKey) => {
   const hints = {
+    'text-block': {
+      'variant': '(стиль оформления блока)',
+      'content': '(можно использовать HTML)'
+    },
     'section-heading': {
-      'level': '(h2 или h3)'
+      'level': '(размер заголовка)',
+      'variant': '(стиль оформления заголовка)'
     },
     'quote': {
-      'variant': '(default или accent)'
+      'variant': '(стиль оформления цитаты)'
     },
     'announcement': {
-      'type': '(info, important, success)',
-      'icon': '(info, warning, check)',
-      'content': '(HTML текст объявления)'
+      'type': '(цветовая схема)',
+      'icon': '(иконка для объявления)',
+      'content': '(можно использовать HTML)'
     },
     'image': {
-      'size': '(small, medium, large)',
+      'size': '(размер отображения)',
       'src': '(ссылка на изображение)'
+    },
+    'video': {
+      'url': '(YouTube, VK, Rutube)',
+      'description': '(необязательно)'
+    },
+    'document': {
+      'url': '(Google Drive, Яндекс.Диск или прямая ссылка)',
+      'size': '(например: 2.5 МБ)',
+      'description': '(необязательно)',
+      'viewType': '(способ отображения)',
+      'downloadName': '(необязательно)'
     }
   }
   return hints[componentType]?.[propKey] || ''
@@ -593,25 +943,32 @@ const getPropPlaceholder = (componentType, propKey) => {
       'content': 'Введите текст. Можно использовать HTML: <p>, <strong>, <ul>, <li>'
     },
     'section-heading': {
-      'text': 'Заголовок секции',
-      'level': 'h2'
+      'text': 'Заголовок секции'
     },
     'quote': {
       'text': 'Текст цитаты',
-      'author': 'Автор',
-      'variant': 'default'
+      'author': 'Автор цитаты'
     },
     'announcement': {
       'title': 'Заголовок объявления',
-      'content': '<p>Текст объявления</p>',
-      'type': 'info',
-      'icon': 'info'
+      'content': '<p>Текст объявления</p>'
     },
     'image': {
       'src': 'https://example.com/image.jpg',
       'alt': 'Описание изображения',
-      'caption': 'Подпись к изображению',
-      'size': 'medium'
+      'caption': 'Подпись к изображению'
+    },
+    'video': {
+      'url': 'https://www.youtube.com/watch?v=...',
+      'title': 'Название видео',
+      'description': 'Описание видео'
+    },
+    'document': {
+      'url': 'https://drive.google.com/file/d/...',
+      'title': 'Название документа',
+      'size': '2.5 МБ',
+      'description': 'Краткое описание документа',
+      'downloadName': 'document.pdf'
     }
   }
   return placeholders[componentType]?.[propKey] || ''
@@ -626,7 +983,8 @@ const addCard = (componentIndex) => {
   pageContent.value.components[componentIndex].props.cards.push({
     title: 'Новая карточка',
     icon: 'star',
-    content: 'Описание карточки'
+    content: 'Описание карточки',
+    variant: 'default'
   })
 }
 
@@ -639,25 +997,36 @@ const removeCard = async (componentIndex, cardIndex) => {
   }
 }
 
-// Добавление изображения в gallery
-const addGalleryImage = (componentIndex) => {
-  if (!pageContent.value.components[componentIndex].props.images) {
-    pageContent.value.components[componentIndex].props.images = []
+// Добавление элемента в gallery (фото или видео)
+const addGalleryItem = (componentIndex, type) => {
+  if (!pageContent.value.components[componentIndex].props.items) {
+    pageContent.value.components[componentIndex].props.items = []
   }
   
-  pageContent.value.components[componentIndex].props.images.push({
-    src: 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=1200',
-    alt: 'Описание изображения',
-    caption: 'Подпись к изображению'
-  })
+  const newItem = type === 'video' 
+    ? {
+        type: 'video',
+        src: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        alt: 'Описание видео',
+        caption: 'Подпись к видео',
+        thumbnail: ''
+      }
+    : {
+        type: 'image',
+        src: 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=1200',
+        alt: 'Описание изображения',
+        caption: 'Подпись к изображению'
+      }
+  
+  pageContent.value.components[componentIndex].props.items.push(newItem)
 }
 
-// Удаление изображения из gallery
-const removeGalleryImage = async (componentIndex, imageIndex) => {
-  const confirmed = await confirmAction('Удалить это изображение?')
+// Удаление элемента из gallery
+const removeGalleryItem = async (componentIndex, itemIndex) => {
+  const confirmed = await confirmAction('Удалить этот элемент?')
   
   if (confirmed) {
-    pageContent.value.components[componentIndex].props.images.splice(imageIndex, 1)
+    pageContent.value.components[componentIndex].props.items.splice(itemIndex, 1)
   }
 }
 
@@ -710,16 +1079,79 @@ const createNewPage = async () => {
   color: #1a1a2e;
 }
 
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 .back-link {
   color: #00DC82;
   text-decoration: none;
   font-weight: 600;
 }
 
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.logout-btn {
+  padding: 0.75rem 1.5rem;
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.logout-btn:hover {
+  background: #ff3838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tab-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: #666;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.tab-btn:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.tab-btn.active {
+  background: #00DC82;
+  color: white;
+}
+
 .admin-content {
   display: grid;
   grid-template-columns: 350px 1fr;
   gap: 2rem;
+}
+
+.admin-content-single {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .section {
@@ -1002,6 +1434,20 @@ const createNewPage = async () => {
   font-size: 1rem;
 }
 
+.gallery-item-editor {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.gallery-add-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .image-editor {
   padding: 1rem;
   margin-bottom: 1rem;
@@ -1170,6 +1616,33 @@ const createNewPage = async () => {
   color: #666;
 }
 
+.contacts-editor {
+  padding: 1.5rem;
+}
+
+.coordinates-input {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 0.5rem;
+  color: #999;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.field-hint a {
+  color: #00DC82;
+  text-decoration: none;
+}
+
+.field-hint a:hover {
+  text-decoration: underline;
+}
+
 .help-panel {
   padding: 1.5rem;
   background: #f0f9ff;
@@ -1224,9 +1697,71 @@ const createNewPage = async () => {
   text-decoration: underline;
 }
 
+.showcase-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white !important;
+  text-decoration: none !important;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s;
+  margin: 0.5rem 0;
+}
+
+.showcase-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  text-decoration: none !important;
+}
+
+@media (max-width: 768px) {
+  .admin-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .admin-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .logout-btn {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9rem;
+  }
+}
+
 @media (max-width: 1024px) {
   .admin-content {
     grid-template-columns: 1fr;
   }
+}
+
+.loading-fallback {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e0e0e0;
+  border-top-color: #00DC82;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>

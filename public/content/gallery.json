@@ -7,27 +7,50 @@
       "type": "section-heading",
       "props": {
         "text": "День знаний 2025",
-        "level": "h2"
+        "level": "h3"
       }
     },
     {
       "type": "gallery",
       "props": {
-        "images": [
+        "items": [
           {
+            "type": "image",
             "src": "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=1200",
             "alt": "Ученики в классе",
             "caption": "Первый урок в новом учебном году"
           },
           {
+            "type": "image",
             "src": "https://images.unsplash.com/photo-1503676382389-4809596d5290?w=1200",
             "alt": "Школьный праздник",
             "caption": "Праздничный концерт для первоклассников"
           },
           {
+            "type": "image",
             "src": "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=1200",
             "alt": "Учителя",
             "caption": "Наши замечательные учителя"
+          },
+          {
+            "type": "video",
+            "src": "https://vkvideo.ru/video-219275653_456239252?sh=4",
+            "alt": "Креативность",
+            "caption": "Подпись к видео",
+            "thumbnail": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAIq1AjDbT7-o-fFpAnGx3p-zNU-U09j0vEw&s"
+          },
+          {
+            "type": "video",
+            "src": "https://vk.com/video-220754053_456245293",
+            "alt": "Описание видео",
+            "caption": "Подпись к видео",
+            "thumbnail": ""
+          },
+          {
+            "type": "image",
+            "src": "https://sun9-27.userapi.com/s/v1/ig2/sMfSs5SOwVEuwHMF7hekNNA30BL_8CvXgpRCyOK8W48x-la-Tx8KskgJeuXehCWTOo79Tbh0x8XVH2Y3DTdMwQtb.jpg?quality=95&as=32x43,48x64,72x96,108x144,160x213,240x320,360x480,480x640,540x720,640x853,720x960,1080x1440&from=bu&cs=1080x0",
+            "alt": "Описание изображения",
+            "caption": "Подпись к изображению"
           }
         ]
       }
@@ -35,7 +58,7 @@
     {
       "type": "section-heading",
       "props": {
-        "text": "Наша школа",
+        "text": "Центр Логос",
         "level": "h2"
       }
     },
@@ -43,9 +66,55 @@
       "type": "image",
       "props": {
         "src": "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800",
-        "alt": "Школьное здание",
-        "caption": "Главный корпус нашей школы",
-        "size": "large"
+        "alt": "Здание центра",
+        "caption": "Главный корпус Центра Логос",
+        "size": "small"
+      }
+    },
+    {
+      "type": "document",
+      "props": {
+        "url": "https://drive.google.com/file/d/1FGRSWBCFLAY2V51RogTP1zJtFSCdzau3/view?usp=sharing",
+        "title": "Учебник",
+        "size": "35 МБ",
+        "description": "Учебник",
+        "viewType": "link",
+        "downloadName": "учебник"
+      }
+    },
+    {
+      "type": "video",
+      "props": {
+        "url": "https://vkvideo.ru/video-219275653_456239252?sh=4",
+        "title": "Креативность",
+        "description": "просто видос"
+      }
+    },
+    {
+      "type": "info-cards",
+      "props": {
+        "cards": [
+          {
+            "title": "Карточка 1",
+            "icon": "star",
+            "content": "Описание карточки 1"
+          },
+          {
+            "title": "Карточка 2",
+            "icon": "heart",
+            "content": "Описание карточки 2"
+          }
+        ]
+      }
+    },
+    {
+      "type": "announcement",
+      "props": {
+        "title": "Заголовок объявления",
+        "content": "<p>Текст объявления</p>",
+        "date": "19.02.2026",
+        "type": "important",
+        "icon": "warning"
       }
     }
   ]

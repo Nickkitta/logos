@@ -7,7 +7,7 @@
     
     <aside class="sidebar" :class="{ 'mobile-open': mobileMenuOpen }">
       <div class="logo">
-        <h2>ЛОГОС</h2>
+        <h2>Центр Логос</h2>
       </div>
       <nav class="nav">
         <NuxtLink 

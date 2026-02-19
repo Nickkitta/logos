@@ -10,8 +10,8 @@
         <ContactInfo :contacts="contacts" />
         
         <YandexMap 
-          address="г. Волгоград, ул. Рабоче-Крестьянская, д. 44"
-          :coordinates="[48.690761, 44.487217]"
+          :address="mapAddress"
+          :coordinates="mapCoordinates"
           :zoom="16"
         />
       </div>
@@ -98,18 +98,57 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 
 const config = useRuntimeConfig()
-const schoolEmail = config.public.schoolEmail
+const schoolEmail = ref('')
 const { error: notifyError } = useNotify()
 
-const contacts = [
-  { icon: 'location', label: 'Адрес', value: 'г. Москва, ул. Школьная, д. 15' },
-  { icon: 'phone', label: 'Телефон', value: '+7 (495) 123-45-67' },
-  { icon: 'email', label: 'Email', value: schoolEmail },
-  { icon: 'clock', label: 'Режим работы', value: 'Пн-Пт: 8:00 - 18:00' }
-]
+const contacts = ref([])
+const mapAddress = ref('')
+const mapCoordinates = ref([48.690761, 44.487217])
+
+// Загрузка контактных данных
+onMounted(async () => {
+  try {
+    const response = await fetch('/content/contacts.json')
+    if (response.ok) {
+      const data = await response.json()
+      
+      schoolEmail.value = data.email
+      mapAddress.value = data.address
+      mapCoordinates.value = data.coordinates
+      
+      contacts.value = [
+        { icon: 'location', label: 'Адрес', value: data.address },
+        { icon: 'phone', label: 'Телефон', value: data.phone },
+        { icon: 'email', label: 'Email', value: data.email },
+        { icon: 'clock', label: 'Режим работы', value: data.workingHours }
+      ]
+    } else {
+      // Fallback на дефолтные значения
+      schoolEmail.value = config.public.schoolEmail
+      contacts.value = [
+        { icon: 'location', label: 'Адрес', value: 'г. Москва, ул. Школьная, д. 15' },
+        { icon: 'phone', label: 'Телефон', value: '+7 (495) 123-45-67' },
+        { icon: 'email', label: 'Email', value: schoolEmail.value },
+        { icon: 'clock', label: 'Режим работы', value: 'Пн-Пт: 8:00 - 18:00' }
+      ]
+      mapAddress.value = 'г. Москва, ул. Школьная, д. 15'
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки контактов:', error)
+    // Fallback на дефолтные значения
+    schoolEmail.value = config.public.schoolEmail
+    contacts.value = [
+      { icon: 'location', label: 'Адрес', value: 'г. Москва, ул. Школьная, д. 15' },
+      { icon: 'phone', label: 'Телефон', value: '+7 (495) 123-45-67' },
+      { icon: 'email', label: 'Email', value: schoolEmail.value },
+      { icon: 'clock', label: 'Режим работы', value: 'Пн-Пт: 8:00 - 18:00' }
+    ]
+    mapAddress.value = 'г. Москва, ул. Школьная, д. 15'
+  }
+})
 
 const formData = reactive({
   name: '',
@@ -135,9 +174,6 @@ const handleSubmit = async () => {
   }
 
   try {
-    console.log('Отправка формы...', formData)
-    
-    // Отправка через API
     const response = await fetch('/api/contact', {
       method: 'POST',
       headers: {
@@ -146,10 +182,7 @@ const handleSubmit = async () => {
       body: JSON.stringify(formData)
     })
 
-    console.log('Статус ответа:', response.status)
-    
     const result = await response.json()
-    console.log('Ответ сервера:', result)
 
     if (response.ok) {
       submitStatus.value = 'success'
@@ -160,7 +193,7 @@ const handleSubmit = async () => {
       formData.message = ''
     } else {
       submitStatus.value = 'error'
-      console.error('Ошибка от сервера:', result)
+      console.error('Ошибка отправки:', result.message)
     }
   } catch (error) {
     console.error('Ошибка отправки:', error)

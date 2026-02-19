@@ -23,13 +23,17 @@
             :key="cardIndex"
             :title="card.title"
             :icon="card.icon"
+            :variant="card.variant || 'default'"
           >
             <p>{{ card.content }}</p>
           </InfoCard>
         </div>
 
         <!-- Текстовый блок с HTML контентом -->
-        <TextBlock v-else-if="component.type === 'text-block'">
+        <TextBlock 
+          v-else-if="component.type === 'text-block'"
+          :variant="component.props.variant || 'default'"
+        >
           <div v-html="component.props.content"></div>
         </TextBlock>
 
@@ -38,14 +42,15 @@
           v-else-if="component.type === 'quote'"
           :text="component.props.text"
           :author="component.props.author"
-          :variant="component.props.variant"
+          :variant="component.props.variant || 'default'"
         />
 
         <!-- Заголовок секции -->
         <SectionHeading 
           v-else-if="component.type === 'section-heading'"
           :text="component.props.text"
-          :level="component.props.level"
+          :level="component.props.level || 'h2'"
+          :variant="component.props.variant || 'default'"
         />
 
         <!-- Изображение -->
@@ -71,7 +76,26 @@
         <!-- Галерея -->
         <PhotoGallery 
           v-else-if="component.type === 'gallery'"
-          :images="component.props.images"
+          :items="component.props.items"
+        />
+
+        <!-- Видео -->
+        <VideoEmbed 
+          v-else-if="component.type === 'video'"
+          :url="component.props.url"
+          :title="component.props.title"
+          :description="component.props.description"
+        />
+
+        <!-- Документ -->
+        <DocumentViewer 
+          v-else-if="component.type === 'document'"
+          :url="component.props.url"
+          :title="component.props.title"
+          :size="component.props.size"
+          :description="component.props.description"
+          :viewType="component.props.viewType"
+          :downloadName="component.props.downloadName"
         />
 
         <!-- Контактная информация -->

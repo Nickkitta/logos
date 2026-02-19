@@ -3,7 +3,7 @@
     {
       "id": "about",
       "path": "/about",
-      "title": "О школе",
+      "title": "О центре",
       "visible": true,
       "order": 1
     },
@@ -20,13 +20,6 @@
       "title": "Галерея",
       "visible": true,
       "order": 3
-    },
-    {
-      "id": "test",
-      "path": "/test",
-      "title": "Тестовая",
-      "visible": true,
-      "order": 4
     }
   ]
 }

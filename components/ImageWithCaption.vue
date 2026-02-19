@@ -1,13 +1,26 @@
 <template>
   <figure class="image-with-caption" :class="size">
-    <div class="image-wrapper">
+    <div class="image-wrapper" @click="openLightbox">
       <img :src="src" :alt="alt" />
+      <div class="zoom-hint">🔍 Нажмите для увеличения</div>
     </div>
     <figcaption v-if="caption">{{ caption }}</figcaption>
+    
+    <!-- Лайтбокс -->
+    <MediaLightbox
+      :isOpen="lightboxOpen"
+      type="image"
+      :src="src"
+      :alt="alt"
+      :caption="caption"
+      @close="lightboxOpen = false"
+    />
   </figure>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+
 defineProps({
   src: String,
   alt: String,
@@ -17,6 +30,12 @@ defineProps({
     default: 'medium'
   }
 })
+
+const lightboxOpen = ref(false)
+
+const openLightbox = () => {
+  lightboxOpen.value = true
+}
 </script>
 
 <style scoped>
@@ -35,6 +54,8 @@ defineProps({
   background: #f5f5f5;
   width: 100%;
   height: 400px;
+  position: relative;
+  cursor: zoom-in;
 }
 
 img {
@@ -43,6 +64,24 @@ img {
   object-fit: cover;
   display: block;
   transition: transform 0.3s ease;
+}
+
+.zoom-hint {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.image-wrapper:hover .zoom-hint {
+  opacity: 1;
 }
 
 .image-with-caption:hover img {
