@@ -4,6 +4,9 @@
     <div class="admin-header">
       <h1>🎨 Панель управления контентом</h1>
       <div class="header-actions">
+        <span v-if="versionInfo" class="version-badge" :title="`Build: ${versionInfo.buildDate}\nCommit: ${versionInfo.gitCommit}\nEnv: ${versionInfo.environment}`">
+          v{{ versionInfo.version }}
+        </span>
         <NuxtLink to="/" class="back-link">← Вернуться на сайт</NuxtLink>
         <button @click="logout" class="logout-btn">🚪 Выйти</button>
       </div>
@@ -538,6 +541,9 @@ const showAddComponent = ref(false)
 const showHelp = ref(false)
 const activeTab = ref('pages')
 
+// Версия приложения
+const versionInfo = ref(null)
+
 // Контакты
 const contactsData = ref({
   address: '',
@@ -575,12 +581,25 @@ const logout = () => {
 onMounted(async () => {
   await loadPagesList()
   await loadContacts()
+  await loadVersion()
 })
 
 const loadPagesList = async () => {
   loading.value = true
   pages.value = await loadPages()
   loading.value = false
+}
+
+// Загрузка версии
+const loadVersion = async () => {
+  try {
+    const response = await fetch('/api/version')
+    if (response.ok) {
+      versionInfo.value = await response.json()
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки версии:', error)
+  }
 }
 
 // Загрузка контактов
@@ -1083,6 +1102,23 @@ const createNewPage = async () => {
   display: flex;
   gap: 1rem;
   align-items: center;
+}
+
+.version-badge {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: help;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.version-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .back-link {
