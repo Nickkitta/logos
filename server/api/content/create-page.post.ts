@@ -1,5 +1,6 @@
-import { writeFile, readFile } from 'fs/promises'
+import { writeFile } from 'fs/promises'
 import { join } from 'path'
+import { getPages, savePages, saveContent } from '~/server/utils/storage'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -13,12 +14,12 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Читаем текущий список страниц из public/content
-    const pagesPath = join(process.cwd(), 'public', 'content', 'pages.json')
-    const pagesData = JSON.parse(await readFile(pagesPath, 'utf-8'))
+    // Получаем текущий список страниц
+    const pagesData = await getPages()
+    const pages = Array.isArray(pagesData) ? pagesData : (pagesData.pages || [])
 
     // Проверяем что страница не существует
-    if (pagesData.pages.find((p: any) => p.id === id)) {
+    if (pages.find((p: any) => p.id === id)) {
       throw createError({
         statusCode: 400,
         message: 'Страница с таким ID уже существует'
@@ -31,16 +32,15 @@ export default defineEventHandler(async (event) => {
       path,
       title,
       visible,
-      order: pagesData.pages.length + 1
+      order: pages.length + 1
     }
 
-    pagesData.pages.push(newPage)
+    pages.push(newPage)
 
     // Сохраняем обновленный список
-    await writeFile(pagesPath, JSON.stringify(pagesData, null, 2), 'utf-8')
+    await savePages({ pages })
 
-    // Создаем файл контента для новой страницы в public/content
-    const contentPath = join(process.cwd(), 'public', 'content', `${id}.json`)
+    // Создаем контент для новой страницы
     const defaultContent = {
       id,
       title,
@@ -48,20 +48,21 @@ export default defineEventHandler(async (event) => {
       components: []
     }
 
-    await writeFile(contentPath, JSON.stringify(defaultContent, null, 2), 'utf-8')
+    await saveContent(id, defaultContent)
 
-    // Создаем Vue файл в папке pages
-    const pagePath = join(process.cwd(), 'pages', `${id}.vue`)
-    const vueTemplate = `<template>
+    // Создаем Vue файл в папке pages (только локально)
+    if (process.env.VERCEL !== '1') {
+      const pagePath = join(process.cwd(), 'pages', `${id}.vue`)
+      const vueTemplate = `<template>
   <DynamicPage :pageId="'${id}'" />
 </template>
 
 <script setup>
-// Динамическая страница, контент загружается из /public/content/${id}.json
+// Динамическая страница, контент загружается из хранилища
 </script>
 `
-
-    await writeFile(pagePath, vueTemplate, 'utf-8')
+      await writeFile(pagePath, vueTemplate, 'utf-8')
+    }
 
     return {
       success: true,

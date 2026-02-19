@@ -1,5 +1,6 @@
-import { unlink, readFile, writeFile } from 'fs/promises'
+import { unlink } from 'fs/promises'
 import { join } from 'path'
+import { getPages, savePages, deleteContent } from '~/server/utils/storage'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -13,12 +14,12 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Читаем текущий список страниц
-    const pagesPath = join(process.cwd(), 'public', 'content', 'pages.json')
-    const pagesData = JSON.parse(await readFile(pagesPath, 'utf-8'))
+    // Получаем текущий список страниц
+    const pagesData = await getPages()
+    const pages = Array.isArray(pagesData) ? pagesData : (pagesData.pages || [])
 
     // Находим страницу
-    const pageIndex = pagesData.pages.findIndex((p: any) => p.id === id)
+    const pageIndex = pages.findIndex((p: any) => p.id === id)
     
     if (pageIndex === -1) {
       throw createError({
@@ -28,25 +29,22 @@ export default defineEventHandler(async (event) => {
     }
 
     // Удаляем страницу из списка
-    pagesData.pages.splice(pageIndex, 1)
+    pages.splice(pageIndex, 1)
 
     // Сохраняем обновленный список
-    await writeFile(pagesPath, JSON.stringify(pagesData, null, 2), 'utf-8')
+    await savePages({ pages })
 
-    // Удаляем файл контента
-    const contentPath = join(process.cwd(), 'public', 'content', `${id}.json`)
-    try {
-      await unlink(contentPath)
-    } catch (e) {
-      console.warn(`Файл контента ${id}.json не найден`)
-    }
+    // Удаляем контент страницы
+    await deleteContent(id)
 
-    // Удаляем Vue файл из папки pages
-    const pagePath = join(process.cwd(), 'pages', `${id}.vue`)
-    try {
-      await unlink(pagePath)
-    } catch (e) {
-      console.warn(`Файл страницы ${id}.vue не найден`)
+    // Удаляем Vue файл из папки pages (только локально)
+    if (process.env.VERCEL !== '1') {
+      const pagePath = join(process.cwd(), 'pages', `${id}.vue`)
+      try {
+        await unlink(pagePath)
+      } catch (e) {
+        console.warn(`Файл страницы ${id}.vue не найден`)
+      }
     }
 
     return {
