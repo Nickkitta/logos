@@ -4,23 +4,16 @@
 
 import { readFile, writeFile, readdir } from 'fs/promises'
 import { join } from 'path'
+import { kv } from '@vercel/kv'
 
-// Определяем окружение
-const isProduction = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production'
-
-// Lazy import KV только на продакшене
-let kv: any = null
-if (isProduction) {
-  import('@vercel/kv').then(module => {
-    kv = module.kv
-  })
-}
+// Определяем окружение - на Vercel всегда используем KV
+const isProduction = process.env.VERCEL === '1' || process.env.VERCEL_ENV === 'production'
 
 /**
  * Получить контент по ID
  */
 export async function getContent(pageId: string): Promise<any> {
-  if (isProduction && kv) {
+  if (isProduction) {
     // Продакшн: используем Vercel KV
     const content = await kv.get(`content:${pageId}`)
     return content
@@ -40,7 +33,7 @@ export async function getContent(pageId: string): Promise<any> {
  * Сохранить контент
  */
 export async function saveContent(pageId: string, content: any): Promise<void> {
-  if (isProduction && kv) {
+  if (isProduction) {
     // Продакшн: сохраняем в Vercel KV
     await kv.set(`content:${pageId}`, content)
   } else {
@@ -53,11 +46,12 @@ export async function saveContent(pageId: string, content: any): Promise<void> {
 /**
  * Получить список всех страниц
  */
-export async function getPages(): Promise<any[]> {
-  if (isProduction && kv) {
+export async function getPages(): Promise<any> {
+  if (isProduction) {
     // Продакшн: получаем из KV
     const pages = await kv.get('content:pages')
-    return pages || []
+    // Если данных нет, возвращаем пустую структуру
+    return pages || { pages: [] }
   } else {
     // Локально: читаем из JSON
     try {
@@ -65,7 +59,7 @@ export async function getPages(): Promise<any[]> {
       const data = await readFile(path, 'utf-8')
       return JSON.parse(data)
     } catch (error) {
-      return []
+      return { pages: [] }
     }
   }
 }
@@ -73,14 +67,14 @@ export async function getPages(): Promise<any[]> {
 /**
  * Сохранить список страниц
  */
-export async function savePages(pages: any[]): Promise<void> {
-  if (isProduction && kv) {
+export async function savePages(pagesData: any): Promise<void> {
+  if (isProduction) {
     // Продакшн: сохраняем в KV
-    await kv.set('content:pages', pages)
+    await kv.set('content:pages', pagesData)
   } else {
     // Локально: сохраняем в JSON
     const path = join(process.cwd(), 'public', 'content', 'pages.json')
-    await writeFile(path, JSON.stringify(pages, null, 2), 'utf-8')
+    await writeFile(path, JSON.stringify(pagesData, null, 2), 'utf-8')
   }
 }
 
@@ -88,7 +82,7 @@ export async function savePages(pages: any[]): Promise<void> {
  * Удалить контент
  */
 export async function deleteContent(pageId: string): Promise<void> {
-  if (isProduction && kv) {
+  if (isProduction) {
     // Продакшн: удаляем из KV
     await kv.del(`content:${pageId}`)
   } else {
@@ -107,7 +101,7 @@ export async function deleteContent(pageId: string): Promise<void> {
  * Получить все ключи контента (для миграции)
  */
 export async function getAllContentKeys(): Promise<string[]> {
-  if (isProduction && kv) {
+  if (isProduction) {
     // Продакшн: получаем все ключи из KV
     const keys = await kv.keys('content:*')
     return keys.map((key: string) => key.replace('content:', ''))
