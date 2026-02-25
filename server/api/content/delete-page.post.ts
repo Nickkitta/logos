@@ -13,11 +13,8 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Путь к файлам - в production используем .output, в dev используем public
-    const baseDir = process.env.NODE_ENV === 'production'
-      ? join(process.cwd(), '.output', 'public', 'content')
-      : join(process.cwd(), 'public', 'content')
-    const pagesPath = join(baseDir, 'pages.json')
+    // Путь к файлам в public/content (только для локальной разработки)
+    const pagesPath = join(process.cwd(), 'public', 'content', 'pages.json')
     const pagesData = JSON.parse(await readFile(pagesPath, 'utf-8'))
 
     // Находим страницу
@@ -37,7 +34,7 @@ export default defineEventHandler(async (event) => {
     await writeFile(pagesPath, JSON.stringify(pagesData, null, 2), 'utf-8')
 
     // Удаляем файл контента
-    const contentPath = join(baseDir, `${id}.json`)
+    const contentPath = join(process.cwd(), 'public', 'content', `${id}.json`)
     try {
       await unlink(contentPath)
     } catch (e) {
