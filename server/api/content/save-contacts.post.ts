@@ -1,4 +1,5 @@
-import { saveContent } from '~/server/utils/storage'
+import { writeFile } from 'fs/promises'
+import { join } from 'path'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -28,7 +29,9 @@ export default defineEventHandler(async (event) => {
       workingHours
     }
 
-    await saveContent('contacts', contactsData)
+    // Сохраняем в public/content/contacts.json
+    const contactsPath = join(process.cwd(), 'public', 'content', 'contacts.json')
+    await writeFile(contactsPath, JSON.stringify(contactsData, null, 2), 'utf-8')
 
     return {
       success: true,

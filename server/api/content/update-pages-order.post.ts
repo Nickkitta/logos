@@ -1,4 +1,5 @@
-import { savePages } from '~/server/utils/storage'
+import { readFile, writeFile } from 'fs/promises'
+import { join } from 'path'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -12,14 +13,18 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Читаем текущий файл pages.json
+    const pagesPath = join(process.cwd(), 'public', 'content', 'pages.json')
+    const pagesData = JSON.parse(await readFile(pagesPath, 'utf-8'))
+
     // Обновляем порядок
-    const updatedPages = pages.map((page, index) => ({
+    pagesData.pages = pages.map((page, index) => ({
       ...page,
       order: index + 1
     }))
 
     // Сохраняем обновленный список
-    await savePages({ pages: updatedPages })
+    await writeFile(pagesPath, JSON.stringify(pagesData, null, 2), 'utf-8')
 
     return {
       success: true,

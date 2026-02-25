@@ -91,38 +91,51 @@ ADMIN_PASSWORD=ваш_надежный_пароль
 
 ## 🌐 Деплой на хостинг
 
-### Рекомендуется: Vercel + Vercel KV (бесплатно, 15 минут)
+### Рекомендуется: VPS (Reg.ru или другой)
 
-**CMS работает на продакшене благодаря Vercel KV!**
+Проект использует файловую систему для хранения контента, поэтому лучше всего подходит VPS или обычный хостинг с Node.js.
+
+**Требования:**
+- Node.js 20+
+- Доступ к файловой системе (для записи в `/public/content/`)
+- PM2 для управления процессом (рекомендуется)
+
+**Быстрый деплой на VPS:**
 
 ```bash
-# 1. Создай репозиторий на GitHub
-git init
-git add .
-git commit -m "Ready for deployment"
-git remote add origin https://github.com/username/repo.git
-git push -u origin main
+# 1. Склонируй репозиторий
+git clone https://github.com/username/repo.git
+cd repo
 
-# 2. Зайди на vercel.com и импортируй проект
-# 3. Создай Vercel KV базу (Storage → Create Database → KV)
-# 4. Добавь переменные окружения
-# 5. Мигрируй данные: npm run migrate:kv
-# 6. Deploy!
+# 2. Установи зависимости
+npm install
+
+# 3. Создай .env файл
+cp .env.example .env
+# Отредактируй .env - добавь свои ключи
+
+# 4. Собери проект
+npm run build
+
+# 5. Запусти с PM2
+npm install -g pm2
+pm2 start .output/server/index.mjs --name school
+pm2 save
+pm2 startup
 ```
 
-Подробная инструкция: [VERCEL_KV_DEPLOYMENT.md](./VERCEL_KV_DEPLOYMENT.md)
-
-**Хватит ли места для 20 страниц?**
-- Бесплатно: 256 MB
-- 20 страниц: ~1 MB
-- Запас: в 256 раз! 🎉
+Подробная инструкция: [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 
 ### Альтернативы:
-- Supabase (PostgreSQL + файловое хранилище)
-- MongoDB Atlas (NoSQL)
-- Reg.ru VPS (~500₽/мес, сложнее)
 
-Сравнение: [CMS_DATABASE_OPTIONS.md](./CMS_DATABASE_OPTIONS.md)
+**Shared Hosting с Node.js:**
+- Если есть доступ к файловой системе - работает отлично
+- Проверь что хостинг поддерживает Node.js 20+
+
+**⚠️ НЕ подходит:**
+- Vercel, Netlify, Cloudflare Pages (serverless)
+- Файловая система read-only
+- CMS не сможет сохранять изменения
 
 ## 📝 Лицензия
 

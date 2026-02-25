@@ -1,4 +1,5 @@
-import { saveContent } from '~/server/utils/storage'
+import { writeFile } from 'fs/promises'
+import { join } from 'path'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -12,7 +13,11 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    await saveContent(pageId, content)
+    // Путь к файлу контента в public/content
+    const contentPath = join(process.cwd(), 'public', 'content', `${pageId}.json`)
+
+    // Сохраняем JSON файл
+    await writeFile(contentPath, JSON.stringify(content, null, 2), 'utf-8')
 
     return {
       success: true,
