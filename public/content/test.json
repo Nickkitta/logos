@@ -1,0 +1,16 @@
+{
+  "id": "test",
+  "title": "Тестовая",
+  "subtitle": "Крутая",
+  "components": [
+    {
+      "type": "image",
+      "props": {
+        "src": "https://img05.rl0.ru/afisha/e1200x800i/daily.afisha.ru/uploads/images/c/d4/cd4c211bf22040ffa44ba578afadf5f1.jpg",
+        "alt": "Описание изображения",
+        "caption": "Подпись к изображению",
+        "size": "large"
+      }
+    }
+  ]
+}

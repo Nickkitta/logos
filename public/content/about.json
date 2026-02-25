@@ -2,21 +2,5 @@
   "id": "about",
   "title": "О Центре Логос",
   "subtitle": "История, миссия и ценности",
-  "components": [
-    {
-      "type": "text-block",
-      "props": {
-        "content": "<p>Крутой текст <b>жирный</b></p>",
-        "variant": "highlight"
-      }
-    },
-    {
-      "type": "quote",
-      "props": {
-        "text": "Текст цитаты",
-        "author": "Автор цитаты",
-        "variant": "accent"
-      }
-    }
-  ]
+  "components": []
 }

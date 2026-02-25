@@ -15,9 +15,9 @@
       "order": 2
     },
     {
-      "id": "gallery",
-      "path": "/gallery-example",
-      "title": "Галерея",
+      "id": "test",
+      "path": "/test",
+      "title": "Тестовая",
       "visible": true,
       "order": 3
     }
