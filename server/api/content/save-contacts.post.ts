@@ -29,8 +29,11 @@ export default defineEventHandler(async (event) => {
       workingHours
     }
 
-    // Сохраняем в public/content/contacts.json
-    const contactsPath = join(process.cwd(), 'public', 'content', 'contacts.json')
+    // Путь к файлу контактов - в production пишем в .output, в dev в public
+    const baseDir = process.env.NODE_ENV === 'production'
+      ? join(process.cwd(), '.output', 'public', 'content')
+      : join(process.cwd(), 'public', 'content')
+    const contactsPath = join(baseDir, 'contacts.json')
     await writeFile(contactsPath, JSON.stringify(contactsData, null, 2), 'utf-8')
 
     return {

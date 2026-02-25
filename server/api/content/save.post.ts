@@ -13,8 +13,11 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Путь к файлу контента в public/content
-    const contentPath = join(process.cwd(), 'public', 'content', `${pageId}.json`)
+    // Путь к файлу контента - в production пишем в .output, в dev в public
+    const baseDir = process.env.NODE_ENV === 'production' 
+      ? join(process.cwd(), '.output', 'public', 'content')
+      : join(process.cwd(), 'public', 'content')
+    const contentPath = join(baseDir, `${pageId}.json`)
 
     // Сохраняем JSON файл
     await writeFile(contentPath, JSON.stringify(content, null, 2), 'utf-8')

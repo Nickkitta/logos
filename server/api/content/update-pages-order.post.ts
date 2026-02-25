@@ -13,8 +13,11 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Читаем текущий файл pages.json
-    const pagesPath = join(process.cwd(), 'public', 'content', 'pages.json')
+    // Путь к файлам - в production используем .output, в dev используем public
+    const baseDir = process.env.NODE_ENV === 'production'
+      ? join(process.cwd(), '.output', 'public', 'content')
+      : join(process.cwd(), 'public', 'content')
+    const pagesPath = join(baseDir, 'pages.json')
     const pagesData = JSON.parse(await readFile(pagesPath, 'utf-8'))
 
     // Обновляем порядок

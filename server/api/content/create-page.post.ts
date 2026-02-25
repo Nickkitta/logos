@@ -13,8 +13,11 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Читаем текущий список страниц из public/content
-    const pagesPath = join(process.cwd(), 'public', 'content', 'pages.json')
+    // Путь к файлам - в production используем .output, в dev используем public
+    const baseDir = process.env.NODE_ENV === 'production'
+      ? join(process.cwd(), '.output', 'public', 'content')
+      : join(process.cwd(), 'public', 'content')
+    const pagesPath = join(baseDir, 'pages.json')
     const pagesData = JSON.parse(await readFile(pagesPath, 'utf-8'))
 
     // Проверяем что страница не существует
@@ -39,8 +42,8 @@ export default defineEventHandler(async (event) => {
     // Сохраняем обновленный список
     await writeFile(pagesPath, JSON.stringify(pagesData, null, 2), 'utf-8')
 
-    // Создаем файл контента для новой страницы в public/content
-    const contentPath = join(process.cwd(), 'public', 'content', `${id}.json`)
+    // Создаем файл контента для новой страницы
+    const contentPath = join(baseDir, `${id}.json`)
     const defaultContent = {
       id,
       title,
