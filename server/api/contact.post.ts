@@ -83,11 +83,14 @@ ${body.message}`
     if (SMTP_USER && SMTP_PASS) {
       const transporter = nodemailer.createTransport({
         host: 'smtp.yandex.ru',
-        port: 465,
-        secure: true,
+        port: 587,
+        secure: false, // true для 465, false для других портов
         auth: {
           user: SMTP_USER,
           pass: SMTP_PASS
+        },
+        tls: {
+          rejectUnauthorized: false
         }
       } as TransportOptions)
 
