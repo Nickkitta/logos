@@ -1,0 +1,18 @@
+{
+  "id": "documents",
+  "title": "Документы",
+  "subtitle": "",
+  "components": [
+    {
+      "type": "document",
+      "props": {
+        "url": "https://disk.yandex.ru/d/m8Z3uduo0_QNCA",
+        "title": "Внешний вид",
+        "size": "12 KB",
+        "description": "Информация о внешнем виде учеников, которые поступают к нам в центр",
+        "viewType": "embed",
+        "downloadName": "Внешний-вид.docx"
+      }
+    }
+  ]
+}

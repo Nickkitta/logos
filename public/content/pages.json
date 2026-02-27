@@ -15,16 +15,16 @@
       "order": 2
     },
     {
-      "id": "test",
-      "path": "/test",
-      "title": "Тестовая",
+      "id": "documents",
+      "path": "/documents",
+      "title": "Документы",
       "visible": true,
       "order": 3
     },
     {
-      "id": "new",
-      "path": "/new",
-      "title": "Новая",
+      "id": "books",
+      "path": "/books",
+      "title": "Учебники",
       "visible": true,
       "order": 4
     }

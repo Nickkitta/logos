@@ -1,0 +1,18 @@
+{
+  "id": "books",
+  "title": "Учебники",
+  "subtitle": "",
+  "components": [
+    {
+      "type": "document",
+      "props": {
+        "url": "https://disk.yandex.ru/i/fIN6kqUNttwKSg",
+        "title": "учебники",
+        "size": "2 МБ",
+        "description": "Условия получения учебников",
+        "viewType": "link",
+        "downloadName": ""
+      }
+    }
+  ]
+}
