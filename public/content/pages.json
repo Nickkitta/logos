@@ -20,6 +20,13 @@
       "title": "Тестовая",
       "visible": true,
       "order": 3
+    },
+    {
+      "id": "new",
+      "path": "/new",
+      "title": "Новая",
+      "visible": true,
+      "order": 4
     }
   ]
 }
